@@ -1,0 +1,10 @@
+{
+    "require": {
+        "respect/rest" : "dev-master",
+        "respect/config" : "0.3.x"
+    },
+    "require-dev": {
+        "phing/phing" : "dev-master"
+    }
+
+}

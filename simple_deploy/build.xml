@@ -1,0 +1,64 @@
+<?xml version="1.0" ?>
+<project name="Deploy my App" basedir="." default="deploy">
+
+    <!-- Remote server properties -->
+    <property file="build.properties"/>
+
+    <!-- Define file groups -->
+    <fileset id="3party-files" dir=".">
+        <include name="vendor/**" />
+        <exclude name="vendor/bin/phing" />
+        <exclude name="vendor/phing/**" />
+    </fileset>
+
+    <fileset id="source-files" dir=".">
+        <include name="src/**" />
+    </fileset>
+
+    <fileset id="web-files" dir=".">
+        <include name="public/**" />
+    </fileset>
+
+    <!-- Deploy action -->
+    <target name="copy">
+        <echo message="Copying ${deploy.fileset} to ${ssh.user}@${ssh.host}:${ssh.basedir}/${remote.dir}" />
+        <!-- Use SCP to copy files to remote server -->
+        <scp username="${ssh.user}"
+            password="${ssh.passwd}"
+            host="${ssh.host}"
+            todir="${ssh.basedir}">
+            <!-- Set fileset to copy -->
+            <fileset refid="${deploy.fileset}" />
+        </scp>
+    </target>
+
+    <!-- Deploy vendor folder -->
+    <target name="deploy-3party">
+        <!-- Call 'copy' target setting what fileset will be copied -->
+        <phingcall target="copy">
+            <property name="deploy.fileset" value="3party-files" />
+        </phingcall>
+    </target>
+
+    <!-- Deploy src folder -->
+    <target name="deploy-source">
+        <phingcall target="copy">
+            <property name="deploy.fileset" value="source-files" />
+        </phingcall>
+    </target>
+
+    <!-- Deploy public folder -->
+    <target name="deploy-web">
+        <phingcall target="copy">
+            <property name="deploy.fileset" value="web-files" />
+        </phingcall>
+    </target>
+
+    <!-- Deploy full app -->
+    <target name="deploy">
+        <phingcall target="deploy-3party" />
+        <phingcall target="deploy-source" />
+        <phingcall target="deploy-web" />
+    </target>
+
+</project>
