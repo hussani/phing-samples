@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<project name="Deploy my App" basedir="." default="deploy">
+    <taskdef name="scpf" classname="custom.Tasks.ScpTaskFilelist" />
+    <property file="build.properties"/>
+    <target name="deploy">
+        <echo message="Looking diff between HEAD and ${commit}" />
+        <exec command="git diff HEAD ${commit} --name-only" escape="false" outputProperty="myfiles" />
+        <echo message="Copying files. This process may take several minutes." />
+        <scpf username="${ssh.user}"
+            password="${ssh.passwd}"
+            host="${ssh.host}"
+            todir="${ssh.basedir}">
+            <!-- Set fileset to copy -->
+            <filelist files="${myfiles}" dir="." />
+        </scpf>
+        <echo message="Done." />
+    </target>
+</project>
