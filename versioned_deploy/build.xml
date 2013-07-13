@@ -1,16 +1,22 @@
 <?xml version="1.0" ?>
-<project name="Deploy my App" basedir="." default="deploy">
+<project name="Deploy based in Git commits" basedir="." default="deploy">
+    <!-- Import task custom/Tasks/ScpTaskFilelist.php with name "scpf" -->
     <taskdef name="scpf" classname="custom.Tasks.ScpTaskFilelist" />
+    <!-- Import properties -->
     <property file="build.properties"/>
     <target name="deploy">
+        <!-- Show message. "commit" property has setted by CLI -->
         <echo message="Looking diff between HEAD and ${commit}" />
+        <!-- Execute "git diff" to get modified files.
+            The list of files are stored into myfiles property -->
         <exec command="git diff HEAD ${commit} --name-only" escape="false" outputProperty="myfiles" />
         <echo message="Copying files. This process may take several minutes." />
+        <!-- Call ScpTaskFilelist task. Is similar to ScpTask, but with filelist support  -->
         <scpf username="${ssh.user}"
             password="${ssh.passwd}"
             host="${ssh.host}"
             todir="${ssh.basedir}">
-            <!-- Set fileset to copy -->
+            <!-- Set filelist to copy and include files of "myfiles" property -->
             <filelist files="${myfiles}" dir="." />
         </scpf>
         <echo message="Done." />
